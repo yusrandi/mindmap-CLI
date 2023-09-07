@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "857544303019",
+    "project_id": "mindmap-339fd",
+    "storage_bucket": "mindmap-339fd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:857544303019:android:d84a9ad10c54f1d0e3f2ee",
+        "android_client_info": {
+          "package_name": "com.mindmapcli"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "857544303019-ct0je1ak2cg867hf1ur5ducg552e40ve.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mindmapcli",
+            "certificate_hash": "af9127bdc48677373e7de95b8fb26deaea238e48"
+          }
+        },
+        {
+          "client_id": "857544303019-vaclehr3gobvbk918s0uoj4pbj3b24k7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAYwt4RXKCxAt8IIUcFmPRSEMgQqOHGRRI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "857544303019-vaclehr3gobvbk918s0uoj4pbj3b24k7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
