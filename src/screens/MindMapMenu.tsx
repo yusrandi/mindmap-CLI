@@ -78,7 +78,6 @@ export default function MindMapMenuScreen({ navigation }: RootStackScreenProps<"
                             <Line key={index} x1={node.x} y1={node.y} x2={centerX} y2={centerY} stroke={node.color} strokeWidth={20} />
                         ))}
 
-
                         {/* Draw lines from bottom nodes to the center */}
                         {bottomNodes.map((node, index) => (
                             <Line

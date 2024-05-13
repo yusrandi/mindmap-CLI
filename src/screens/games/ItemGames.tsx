@@ -20,28 +20,6 @@ interface props {
 }
 export default function ItemGames({ navigation, history }: props) {
     const listColor = [['#F5F7FA', '#B8C6DB'], ['#FFDD00', '#FBB034'], ['#5AFF15', '#00B712']]
-    const [game, setGame] = useState<GamesType>()
-    // declare the function 
-    const shuffle = (array: SoalType[]) => {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
-        return array;
-    };
-
-    useEffect(() => {
-        console.log(history.idGame);
-        gamesCollection
-            .doc(history.idGame)
-            .get()
-            .then((snapshot) => {
-                // console.log(snapshot.data());
-                const game: GamesType = snapshot.data() as GamesType
-                setGame(game)
-
-            })
-    }, [])
 
     return (
         <TouchableOpacity

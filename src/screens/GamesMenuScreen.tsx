@@ -2,7 +2,7 @@ import { View, Text, useWindowDimensions, Image, TouchableOpacity, FlatList, Lin
 import React, { useEffect, useState } from 'react'
 import { RootStackScreenProps } from '../routers/RootNavigator'
 import { GamesType, SoalType } from '../type/GamesType';
-import { gamesCollection, historiesCollection } from '../config/firebase';
+import { gamesCollection, historiesCollection, historiesDatabaseRef } from '../config/firebase';
 import { BackBack, BgRed, IconBack, IconNext, IconReset } from '../../assets';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Spacing from '../constants/Spacing';
@@ -34,38 +34,61 @@ export default function GamesMenuScreen({ navigation }: RootStackScreenProps<"ga
 
     async function getDataHistories() {
         setUserHistories([])
-
-        historiesCollection
-            .doc(auth().currentUser?.uid)
-            .collection("histories")
-            .onSnapshot((snapshot) => {
+        historiesDatabaseRef
+            .child(auth().currentUser?.uid!)
+            .on('value', snapshot => {
+                console.log('Histories data: ', snapshot.val());
                 setUserHistories([])
-                // console.log(snapshot.docs)
-                snapshot.docs.forEach((data) => {
-                    // console.log({ data });
-                    const historyType: HistoriesType = data.data() as HistoriesType
-                    if (historyType.idGame === gamesTitleData.BABVI && historyType.status === 2) {
-                        setAvail(true)
-                    }
-                    console.log(historyType.status);
-                    setUserHistories((prevData) => [
-                        ...prevData, historyType
-                    ])
-
-                })
+                if (snapshot.exists()) {
+                    const dataFromFirebase: HistoriesType[] = Object.values(snapshot.val() || {});
+                    dataFromFirebase.forEach((data) => {
+                        if (data.idGame === gamesTitleData.BABVI && data.status === 2) {
+                            setAvail(true)
+                        }
+                    })
+                    setUserHistories(dataFromFirebase)
+                }
             })
+
+        // historiesCollection
+        //     .doc(auth().currentUser?.uid)
+        //     .collection("histories")
+        //     .onSnapshot((snapshot) => {
+        //         setUserHistories([])
+        //         // console.log(snapshot.docs)
+        //         snapshot.docs.forEach((data) => {
+        //             // console.log({ data });
+        //             const historyType: HistoriesType = data.data() as HistoriesType
+        //             if (historyType.idGame === gamesTitleData.BABVI && historyType.status === 2) {
+        //                 setAvail(true)
+        //             }
+        //             console.log(historyType.status);
+        //             setUserHistories((prevData) => [
+        //                 ...prevData, historyType
+        //             ])
+
+        //         })
+        //     })
 
         setLoading(false)
     }
 
     async function resetHistories() {
 
-        HistoriesData.histories.map(async (history) => {
-            await historiesCollection
-                .doc(auth().currentUser?.uid!)
-                .collection("histories")
-                .doc(history.idGame)
+        HistoriesData.histories.map((history) => {
+            // historiesCollection
+            //     .doc(auth().currentUser?.uid!)
+            //     .collection("histories")
+            //     .doc(history.idGame)
+            //     .set(history)
+            historiesDatabaseRef.child(auth().currentUser?.uid!).child(history.idGame)
                 .set(history)
+                .then(() => {
+                    console.log('Histories added!')
+                })
+                .catch((error) => {
+                    console.log(`[signup] histories ${error}`);
+                })
         })
 
         navigation.goBack()
@@ -74,7 +97,7 @@ export default function GamesMenuScreen({ navigation }: RootStackScreenProps<"ga
 
     const sorted = (): HistoriesType[] => {
         // return []
-        return [...userHistories].sort(
+        return [...userHistories.filter((item) => item !== null)].sort(
             (a, b) => a.id - b.id
         ) as HistoriesType[];
     };
@@ -104,13 +127,13 @@ export default function GamesMenuScreen({ navigation }: RootStackScreenProps<"ga
                                     </TouchableOpacity>
                                 </View> */}
 
+
                                 <FlatList
                                     data={sorted()}
                                     renderItem={({ item, index }) => (<ItemGames navigation={navigation} history={item} />)}
                                     keyExtractor={(item, index) => index.toString()}
                                 />
-
-                                <Text style={{ color: 'white', fontFamily: Font['juno'], fontSize: FontSize.large, alignSelf: 'center', margin: Spacing * 2 }}>Total Nilai Keseluruhan {(userHistories.reduce((a, v) => a = a + v.score, 0)) * 10}</Text>
+                                <Text style={{ color: 'white', fontFamily: Font['juno'], fontSize: FontSize.large, alignSelf: 'center', margin: Spacing * 2 }}>Total Nilai Keseluruhan {(userHistories.filter((item) => item !== null).reduce((a, v) => a = a + v.score, 0)) * 10}</Text>
                                 {/* <Text style={{ color: 'white', fontFamily: Font['juno'], fontSize: FontSize.large, alignSelf: 'center', margin: Spacing * 2 }}>{avail ? "true" : "false"}</Text> */}
                             </View>
                     }

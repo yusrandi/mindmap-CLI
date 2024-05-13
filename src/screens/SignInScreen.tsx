@@ -22,19 +22,11 @@ export default function SignInScreen({ navigation }: RootStackScreenProps<"signI
 
     useEffect(() => {
         console.log("login");
-
+        // create()
 
     }, [])
 
-    async function create() {
-        await dataRef.once('value')
-            .then((snapshot) => {
-                console.log('Data successfully read.', snapshot.val());
-            })
-            .catch((error) => {
-                console.error('Error writing data:', error);
-            });
-    }
+
     async function handleSignIn() {
 
         if (email !== "" && password !== "") {
@@ -46,7 +38,6 @@ export default function SignInScreen({ navigation }: RootStackScreenProps<"signI
 
                     if (error.code === 'auth/user-not-found') {
                         Alert.alert("User not found")
-
                     }
 
                     if (error.code === 'auth/wrong-password') {

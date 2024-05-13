@@ -98,6 +98,7 @@ export default function BabEnamMenuSub({ navigation, route: { params: { title } 
             setNewTitle(title!)
         } else {
             if (index === 2) {
+                // MATERI
                 let url = ""
                 if (newTitle === BABVI.SBI) {
                     url = "https://firebasestorage.googleapis.com/v0/b/mindmap-339fd.appspot.com/o/Bab%20VI%2FSB1%20Mengumpulkan%20dan%20Mengolah%20Data.pdf?alt=media&token=50339d86-14a2-4f1a-8cde-6f526ddd7936"

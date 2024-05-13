@@ -1,3 +1,12 @@
+export const BABI = {
+    "SBI" : "KPK",
+    "SBII" : "FPB"
+}
+export const BABII = {
+    "SBI" : "Pecahan",
+    "SBII" : "Pecahan Desimal",
+    "SBIII" : "Pecahan Perbandingan"
+}
 export const BABIII = {
     "SBI" : "Mengenal Sudut",
     "SBII" : "Mengenal Sudut Pada Bangun Datar",

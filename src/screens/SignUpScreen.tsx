@@ -1,7 +1,7 @@
 import { View, Text, Image, TouchableOpacity, Alert } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import auth from '@react-native-firebase/auth'
-import { historiesCollection, usersCollection } from '../config/firebase'
+import { historiesCollection, historiesDatabaseRef, usersCollection, usersDatabaseRef } from '../config/firebase'
 import { RootStackScreenProps } from '../routers/RootNavigator'
 import { BgRed } from '../../assets'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -22,20 +22,7 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<"signU
     const [confPassword, setConfPassword] = useState<string>("")
     const [isLoading, setIsLoading] = useState<boolean>(false)
 
-    useEffect(() => {
-        // register()
 
-        console.log("Register");
-
-        database()
-            .ref('/users/123')
-            .set({
-                name: 'Ada Lovelace',
-                age: 31,
-            })
-            .then(() => console.log('Data set.'))
-            .catch((error) => console.log({ error }))
-    }, [])
     async function handleRegister() {
         console.log("hello");
 
@@ -52,14 +39,31 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<"signU
             auth()
                 .createUserWithEmailAndPassword(email, password)
                 .then((userCredential) => {
-                    usersCollection.doc(userCredential.user.uid).set({
-                        email: email,
-                        name: name,
-                        online: true
+
+                    const userId = userCredential.user.uid
+
+                    // usersCollection.doc(userCredential.user.uid).set({
+                    //     email: email,
+                    //     name: name,
+                    //     online: true
+                    // })
+                    //     .then(() => {
+                    //         console.log('User added!');
+                    //         resetHistories()
+                    //     })
+
+                    usersDatabaseRef.child(userId).set({
+                        id: userId,
+                        email: userCredential.user.email,
+                        online: true,
+                        name: name
                     })
                         .then(() => {
                             console.log('User added!');
                             resetHistories()
+                        })
+                        .catch((error) => {
+                            console.log(`[signup] error ${error}`);
                         })
 
                     console.log('User account created & signed in!');
@@ -75,9 +79,7 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<"signU
 
                     console.error(error.code);
                 });
-
             setIsLoading(false)
-
         }
 
     }
@@ -85,11 +87,19 @@ export default function SignUpScreen({ navigation }: RootStackScreenProps<"signU
     async function resetHistories() {
 
         HistoriesData.histories.map((history) => {
-            historiesCollection
-                .doc(auth().currentUser?.uid!)
-                .collection("histories")
-                .doc(history.idGame)
+            // historiesCollection
+            //     .doc(auth().currentUser?.uid!)
+            //     .collection("histories")
+            //     .doc(history.idGame)
+            //     .set(history)
+            historiesDatabaseRef.child(auth().currentUser?.uid!).child(history.idGame.toString())
                 .set(history)
+                .then(() => {
+                    console.log('Histories added!')
+                })
+                .catch((error) => {
+                    console.log(`[signup] histories ${error}`);
+                })
         })
     }
     return (

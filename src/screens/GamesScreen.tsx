@@ -7,7 +7,7 @@ import Font from '../constants/Font';
 import FontSize from '../constants/FontSize';
 import LinearGradient from 'react-native-linear-gradient';
 import { gamesTitleData } from '../data/GamesTitleData';
-import { gamesCollection, historiesCollection } from '../config/firebase';
+import { gamesCollection, gamesDatabaseRef, historiesCollection, historiesDatabaseRef } from '../config/firebase';
 import auth from '@react-native-firebase/auth'
 import { GamesType, SoalType } from '../type/GamesType';
 import { HistoriesData } from '../data/HistoriesData';
@@ -18,26 +18,9 @@ export default function GamesScreen({ navigation, route: { params: { idGame } } 
     const [index, setIndex] = useState(0);
     const [benar, setBenar] = useState(0);
     const urlToCheck = '1/2'; // Replace with the URL you want to check
-    const [game, setGame] = useState<GamesType>()
     const [soals, setSoals] = useState<SoalType[]>([])
-    const [loading, setLoading] = useState<boolean>(false)
+    const [loading, setLoading] = useState<boolean>(true)
 
-
-    // useEffect(() => {
-    //     console.log(game.title);
-
-    //     historiesCollection
-    //         .doc(auth().currentUser?.uid)
-    //         .collection("histories")
-    //         .doc(game.title)
-    //         .update({
-    //             score: 1
-    //         })
-    //         .then(snapshot => {
-    //             console.log({ snapshot });
-    //         })
-
-    // }, [])
     function tebakJawaban(jawaban: string) {
         console.log(`index ${index}`);
         setIndex(index + 1)
@@ -125,31 +108,52 @@ export default function GamesScreen({ navigation, route: { params: { idGame } } 
         }
     }
 
-    async function resetHistories() {
 
-        HistoriesData.histories.map((history) => {
-            historiesCollection
-                .doc(auth().currentUser?.uid!)
-                .collection("histories")
-                .doc(history.idGame)
-                .set(history)
-        })
-    }
     function updateHistory(oldKey: string, newKey: string) {
-        historiesCollection
-            .doc(auth().currentUser?.uid!)
-            .collection("histories")
-            .doc(oldKey)
+        // historiesCollection
+        //     .doc(auth().currentUser?.uid!)
+        //     .collection("histories")
+        //     .doc(oldKey)
+        //     .update({
+        //         status: 2,
+        //         score: benar
+        //     })
+        //     .then(() => {
+        //         if (oldKey !== gamesTitleData.BABVI) {
+        //             historiesCollection
+        //                 .doc(auth().currentUser?.uid!)
+        //                 .collection("histories")
+        //                 .doc(newKey)
+        //                 .update({
+        //                     status: 1
+        //                 })
+        //                 .then(() => {
+        //                     setLoading(false)
+        //                     console.log("updated")
+        //                     navigation.goBack()
+
+        //                 })
+        //         } else {
+        //             setLoading(false)
+        //             console.log("updated")
+        //             navigation.goBack()
+        //         }
+        //     })
+
+        setLoading(true)
+
+        historiesDatabaseRef
+            .child(auth().currentUser?.uid!)
+            .child(oldKey)
             .update({
                 status: 2,
                 score: benar
             })
             .then(() => {
                 if (oldKey !== gamesTitleData.BABVI) {
-                    historiesCollection
-                        .doc(auth().currentUser?.uid!)
-                        .collection("histories")
-                        .doc(newKey)
+                    historiesDatabaseRef
+                        .child(auth().currentUser?.uid!)
+                        .child(newKey)
                         .update({
                             status: 1
                         })
@@ -165,18 +169,21 @@ export default function GamesScreen({ navigation, route: { params: { idGame } } 
                     navigation.goBack()
                 }
             })
+
     }
 
     useEffect(() => {
         console.log(idGame);
-        gamesCollection
-            .doc(idGame)
-            .get()
-            .then((snapshot) => {
-                // console.log(snapshot.data());
-                const game: GamesType = snapshot.data() as GamesType
-                setGame(game)
-                setSoals(shuffle(game.soals))
+        gamesDatabaseRef.child(idGame)
+            .once('value')
+            .then(snapshot => {
+                console.log('Soal data: ', snapshot.val());
+                setSoals([])
+                if (snapshot.exists()) {
+                    const dataFromFirebase: SoalType[] = Object.values(snapshot.val() || {});
+                    setSoals(shuffle(dataFromFirebase))
+                }
+                setLoading(false)
             })
     }, [])
 
@@ -245,7 +252,7 @@ export default function GamesScreen({ navigation, route: { params: { idGame } } 
                     <View style={{ flex: 1, position: 'absolute', top: Spacing * Spacing * 2, bottom: 0, left: 0, right: 0, padding: Spacing * 2 * 2 }}>
                         <View style={{ marginBottom: Spacing, flex: 1, borderColor: 'red', borderWidth: 1, padding: Spacing, width: '100%', borderRadius: Spacing, justifyContent: 'center', alignItems: 'center', height: '100%', alignSelf: 'center' }}>
                             {/* <Text style={{ textAlign: 'center', fontFamily: Font['poppins-regular'], fontSize: FontSize.xxLarge, color: 'black' }}>{game.title}</Text> */}
-                            <Text style={{ textAlign: 'center', fontFamily: Font['poppins-regular'], fontSize: FontSize.large, color: 'black' }}>{soals[index]?.soal}</Text>
+                            <Text style={{ textAlign: 'center', fontFamily: Font['poppins-regular'], fontSize: FontSize.large, color: 'black' }}>{loading ? "......." : soals[index]?.soal}</Text>
                             <Image source={{ uri: soals[index]?.image }} resizeMode='contain' style={{ flex: 1, width: "100%" }} />
 
                         </View>

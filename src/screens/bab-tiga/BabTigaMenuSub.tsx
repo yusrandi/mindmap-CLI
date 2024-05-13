@@ -108,6 +108,7 @@ export default function BabTigaMenuSub({ navigation, route: { params: { title } 
             setNewTitle(title!)
         } else {
             if (index === 2) {
+                // MATERI
                 let url = ""
                 if (newTitle === BABIII.SBI) {
                     url = "https://firebasestorage.googleapis.com/v0/b/mindmap-339fd.appspot.com/o/Bab%20III%2FSB1%20Mengenal%20Sudut.pdf?alt=media&token=72855b36-057f-4fa5-87c2-b3d80b4ddfdd"
@@ -125,6 +126,7 @@ export default function BabTigaMenuSub({ navigation, route: { params: { title } 
             }
             else if (index === 0) {
                 let url = ""
+                // CONTOH SOAL
                 if (newTitle === BABIII.SBI) {
                     url = "https://firebasestorage.googleapis.com/v0/b/mindmap-339fd.appspot.com/o/Bab%20III%2FSB1%20CS%20Mengenal%20Sudut.pdf?alt=media&token=3fd3d45e-ef5e-48e0-9f0b-3bfc7774bf7f"
                 } else if (newTitle === BABIII.SBII) {

@@ -10,11 +10,12 @@ import FontSize from '../constants/FontSize';
 import auth from '@react-native-firebase/auth'
 import LinearGradient from 'react-native-linear-gradient';
 import firestore from '@react-native-firebase/firestore';
-import { historiesCollection, usersCollection } from '../config/firebase';
+import { gamesDatabaseRef, historiesCollection, materisDatabaseRef, usersCollection, usersDatabaseRef } from '../config/firebase';
 import { UserType, emptUser } from '../type/UserType';
 import { gamesData } from '../data/GamesData';
 import { HistoriesType } from '../type/HistoriesType';
 import database from '@react-native-firebase/database';
+import { materiData } from '../data/MateriData';
 
 
 export default function HomeScreen({ navigation }: RootStackScreenProps<"home">) {
@@ -24,29 +25,55 @@ export default function HomeScreen({ navigation }: RootStackScreenProps<"home">)
     }
 
     useEffect(() => {
-        const subscriber = usersCollection
-            .doc(auth().currentUser?.uid)
-            .onSnapshot(documentSnapshot => {
-                const userData: UserType = documentSnapshot.data() as UserType
-                console.log({ userData });
-                setUser(userData)
+        // const subscriber = usersCollection
+        //     .doc(auth().currentUser?.uid)
+        //     .onSnapshot(documentSnapshot => {
+        //         const userData: UserType = documentSnapshot.data() as UserType
+        //         console.log({ userData });
+        //         setUser(userData)
+        //     });
+
+        usersDatabaseRef
+            .child(auth().currentUser?.uid!)
+            .on('value', snapshot => {
+                console.log('User data: ', snapshot.val());
+                setUser(snapshot.val() as UserType)
+
             });
 
         // Stop listening for updates when no longer required
-        return () => subscriber();
+        // return () => subscriber();
     }, [])
 
     useEffect(() => {
-        const newReference = database().ref('/users').push();
-
-        console.log('Auto generated key: ', newReference.key);
-
-        newReference
-            .set({
-                age: 32,
-            })
-            .then(() => console.log('Data updated.'));
+        // createGame()
+        // createMateri()
     }, [])
+
+
+    function createGame() {
+        gamesData.map((game) => {
+            console.log(game.title);
+            game.soals.map((soal) => {
+                console.log(soal.soal);
+                const gameReference = gamesDatabaseRef.child(game.title).push();
+                gameReference.set(soal)
+                    .then(() => console.log("Soal Created"))
+            })
+
+        })
+    }
+
+    function createMateri() {
+        materiData.map((materi) => {
+            materi.subbabs.map((sub) => {
+                materisDatabaseRef.child(materi.title).child(sub.title).set(sub)
+                    .then(() => console.log(`${materi.title} Created`))
+
+            })
+        })
+    }
+
 
     return (
         <View style={{ flex: 1 }}>
